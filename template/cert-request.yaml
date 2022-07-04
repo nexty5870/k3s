@@ -1,0 +1,39 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: external-issuer
+spec:
+  acme:
+    email: <your_email>
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: external-issuer-account-key
+    solvers:
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret
+            key: api-token
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-api-token-secret
+type: Opaque
+stringData:
+  api-token: <cloud_flare_api-toke_here>
+---
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: name_of_the_cert-tls
+spec:
+  secretName: name_of_the_cert-tls
+  issuerRef:
+    name: external-issuer
+    kind: Issuer
+  dnsNames:
+  - url_of_the_domaine
+
